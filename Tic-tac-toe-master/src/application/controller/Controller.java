@@ -12,11 +12,16 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
-    private static final int PLAY_1 = 1;
-    private static final int PLAY_2 = 2;
+    private static final int CIRCLE = 1;
+    private static final int CROSS = -1;
+    public static int PLAY_1 = 1;
+    public static int PLAY_2 = -1;
+    public static int[] pos=new int[2];
     private static final int EMPTY = 0;
     private static final int BOUND = 90;
     private static final int OFFSET = 15;
+    public static boolean myTurn = false;
+
 
     @FXML
     private Pane base_square;
@@ -24,32 +29,41 @@ public class Controller implements Initializable {
     @FXML
     private Rectangle game_panel;
 
-    private static boolean TURN = false;
 
     private static final int[][] chessBoard = new int[3][3];
     private static final boolean[][] flag = new boolean[3][3];
 
+    public void setUser(int player) {
+        PLAY_1 = player;
+        PLAY_2 = -player;
+    }
+
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         game_panel.setOnMouseClicked(event -> {
+//            System.out.println("clicked");
             int x = (int) (event.getX() / BOUND);
             int y = (int) (event.getY() / BOUND);
-            if (refreshBoard(x, y)) {
-                TURN = !TURN;
+            if (myTurn) {
+                pos[0] = x;
+                pos[1] = y;
+                myTurn = false;
             }
         });
     }
 
-    private boolean refreshBoard (int x, int y) {
+
+    public boolean refreshBoard(int x, int y, int player) {
         if (chessBoard[x][y] == EMPTY) {
-            chessBoard[x][y] = TURN ? PLAY_1 : PLAY_2;
+            chessBoard[x][y] = player;
             drawChess();
             return true;
         }
         return false;
     }
 
-    private void drawChess () {
+    private void drawChess() {
         for (int i = 0; i < chessBoard.length; i++) {
             for (int j = 0; j < chessBoard[0].length; j++) {
                 if (flag[i][j]) {
@@ -57,10 +71,10 @@ public class Controller implements Initializable {
                     continue;
                 }
                 switch (chessBoard[i][j]) {
-                    case PLAY_1:
+                    case CIRCLE:
                         drawCircle(i, j);
                         break;
-                    case PLAY_2:
+                    case CROSS:
                         drawLine(i, j);
                         break;
                     case EMPTY:
@@ -73,7 +87,7 @@ public class Controller implements Initializable {
         }
     }
 
-    private void drawCircle (int i, int j) {
+    private void drawCircle(int i, int j) {
         Circle circle = new Circle();
         base_square.getChildren().add(circle);
         circle.setCenterX(i * BOUND + BOUND / 2.0 + OFFSET);
@@ -84,7 +98,7 @@ public class Controller implements Initializable {
         flag[i][j] = true;
     }
 
-    private void drawLine (int i, int j) {
+    private void drawLine(int i, int j) {
         Line line_a = new Line();
         Line line_b = new Line();
         base_square.getChildren().add(line_a);
