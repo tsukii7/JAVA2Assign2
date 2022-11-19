@@ -18,7 +18,7 @@ public class Client extends Application {
 
     private static Scanner fromServer;
     private static PrintWriter toServer;
-    public static int player; // 先手
+    public static int player;
 
     private static Controller controller;
     private static int ID;
@@ -37,7 +37,7 @@ public class Client extends Application {
             return true;
 
         } catch (Exception e) {
-            System.out.println("Falied to connect to the server！\n Program exited.");
+            System.out.println("Falied to connect to the server!\n Program exited.");
             closeConnection(socket);
             System.exit(1);
             return false;

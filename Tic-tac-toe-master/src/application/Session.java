@@ -14,8 +14,8 @@ public class Session implements Runnable {
     private int[][] chessBoard = new int[3][3];
     private int totalStep = 0;
 
-    public int player1 = 1; // 先手
-    public int player2 = -1; // 后手
+    public int player1 = 1;
+    public int player2 = -1;
     private int userID = 0;
     private int gameID = 0;
 

@@ -33,7 +33,7 @@ public class Server {
             socket = server.accept();
             userCnt++;
             System.out.println("\nUser " + userCnt + " connected.");
-            System.out.println("User name：" + socket.getInetAddress().getHostName() + "\tUser ip:"
+            System.out.println("User name:" + socket.getInetAddress().getHostName() + "\tUser ip:"
                     + socket.getInetAddress().getHostAddress());
             System.out.println("Add 1 waiting user.");
             waitingUsers.add(new User(userCnt, socket));
