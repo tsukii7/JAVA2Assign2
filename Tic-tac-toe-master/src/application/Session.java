@@ -34,7 +34,7 @@ public class Session implements Runnable {
         toUser2.println(gameID);
         toUser1.println(player1);
         toUser2.println(player2);
-        System.out.println("The "+gameID+"_th game of User " + (userID - 1) + " and User " + userID + " start!");
+        System.out.println("\n******The "+gameID+"_th game of User " + (userID - 1) + " and User " + userID + " start!******");
         int player = player1;
         try {
             while (receive(player)) {
@@ -53,6 +53,9 @@ public class Session implements Runnable {
         PrintWriter toOpponent = player == player1 ? toUser2 : toUser1;
         toUser.println("GO");
         instruction = fromUser.nextLine();
+        if ("CHOSEN".equals(instruction)){
+            instruction = fromUser.nextLine();
+        }
         switch (instruction) {
             case "MOVE":
                 String pos = fromUser.nextLine();
@@ -65,9 +68,7 @@ public class Session implements Runnable {
                 System.out.println("Game abort! User" + (player == player1 ? userID - 1 : userID) + " exited.");
                 return false;
         }
-
         return true;
-
     }
 
     public boolean step(String pos, int player) {

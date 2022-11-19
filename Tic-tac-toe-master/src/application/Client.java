@@ -21,6 +21,7 @@ public class Client extends Application {
     public static int player; // 先手
 
     private static Controller controller;
+    private static int ID;
 
     public static boolean connect() {
         try {
@@ -36,8 +37,9 @@ public class Client extends Application {
             return true;
 
         } catch (Exception e) {
-            System.out.println("Falied to connect to the server！");
+            System.out.println("Falied to connect to the server！\n Program exited.");
             closeConnection(socket);
+            System.exit(1);
             return false;
         }
     }
@@ -103,12 +105,11 @@ public class Client extends Application {
                             controller.myTurn = false;
                             return;
                         case "OPPONENT_EXIT":
-                            System.out.println("Game abort! Opponent exited.");
+                            System.out.println("Opponent exited. Game abort! ");
                             System.exit(1);
                         case "GO":
                             System.out.println("You go!");
                             try {
-//                            controller.go();
                                 controller.myTurn = true;
                                 while (true) {
                                     if (!controller.myTurn) {
@@ -142,6 +143,28 @@ public class Client extends Application {
         }
     }
 
+    public static void update(String list) {
+        System.out.println("\n\n"+list);
+        System.out.println("Please choose your opponent...");
+        System.out.print("Enter the opponent ID: ");
+
+    }
+
+    private static class ChooseOpponent implements Runnable {
+        @Override
+        public void run() {
+            Scanner in = new Scanner(System.in);
+//            System.out.println("Start capture input...");
+            int id = in.nextInt();
+            while (id == Client.ID) {
+                System.out.println("You can not choose yourself, please enter again.");
+                id = in.nextInt();
+            }
+            System.out.println("You choosed User "+id+".");
+            toServer.println(id);
+        }
+    }
+
     public static void main(String[] args) {
         if (!connect()) {
             return;
@@ -150,13 +173,16 @@ public class Client extends Application {
         try {
             while (true) {
                 instruction = fromServer.nextLine();
-                if ("CHECK_ALIVE".equals(instruction)) {
-                    toServer.println("ALIVE");
-                } else if ("WAIT".equals(instruction)) {
-                    System.out.println("Waiting for the opponent to connect...");
+                if ("ID".equals(instruction)) {
+                    Client.ID = Integer.parseInt(fromServer.nextLine());
+                    System.out.println("(Your ID: "+Client.ID+")");
+                    new Thread(new ChooseOpponent()).start();
+                } else if ("UPDATE".equals(instruction)) {
+                    update(fromServer.nextLine());
                 } else {
-                    System.out.println("The " + instruction + "_th game start!");
-                    player = fromServer.nextInt();
+                    System.out.println("\n******The " + instruction + "_th game start!******");
+                    player = Integer.parseInt(fromServer.nextLine());
+                    toServer.println("CHOSEN");
                     System.out.println("player:" + player);
                     launch(args);
                     break;
