@@ -1,6 +1,10 @@
 package application;
 
 import application.controller.Controller;
+import java.io.*;
+import java.net.Socket;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -8,10 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-import java.io.*;
-import java.net.Socket;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 
 public class Client extends Application {
     private static Socket socket;
@@ -26,18 +26,19 @@ public class Client extends Application {
     public static boolean connect() {
         try {
             socket = new Socket("127.0.0.1", Server.SBAP_PORT);
-            System.out.println("Connect to server successfully, local port:" + socket.getLocalPort());
+            System.out.println("Connect to server successfully, local port:"
+                    + socket.getLocalPort());
 
-            InputStream instream = socket.getInputStream();
-            OutputStream outstream = socket.getOutputStream();
+            InputStream inputstream = socket.getInputStream();
+            OutputStream outputstream = socket.getOutputStream();
 
-            fromServer = new Scanner(instream);
-            toServer = new PrintWriter(outstream, true);
+            fromServer = new Scanner(inputstream);
+            toServer = new PrintWriter(outputstream, true);
 
             return true;
 
         } catch (Exception e) {
-            System.out.println("Falied to connect to the server!\n Program exited.");
+            System.out.println("Failed to connect to the server!\n Program exited.");
             closeConnection(socket);
             System.exit(1);
             return false;
@@ -92,31 +93,37 @@ public class Client extends Application {
                 while (true) {
                     instruction = fromServer.nextLine();
                     switch (instruction) {
-                        case "WIN":
+                        case "WIN" -> {
                             System.out.println("You win!");
                             controller.myTurn = false;
                             return;
-                        case "LOSE":
+                        }
+                        case "LOSE" -> {
                             System.out.println("You lose!");
                             controller.myTurn = false;
                             return;
-                        case "DRAW":
+                        }
+                        case "DRAW" -> {
                             System.out.println("Draw!");
                             controller.myTurn = false;
                             return;
-                        case "OPPONENT_EXIT":
+                        }
+                        case "OPPONENT_EXIT" -> {
                             System.out.println("Opponent exited. Game abort! ");
                             System.exit(1);
-                        case "GO":
+                        }
+                        case "GO" -> {
                             System.out.println("You go!");
                             try {
                                 controller.myTurn = true;
                                 while (true) {
                                     if (!controller.myTurn) {
-                                        Platform.runLater(() -> controller.refreshBoard(controller.pos[0], controller.pos[1], player));
+                                        Platform.runLater(() ->
+                                                controller.refreshBoard(controller.pos[0], controller.pos[1], player));
                                         toServer.println("MOVE");
                                         toServer.println(controller.pos[0] + " " + controller.pos[1]);
-                                        System.out.println("You choosed (" + controller.pos[0] + ", " + controller.pos[1] + ").");
+                                        System.out.println("You chose ("
+                                                + controller.pos[0] + ", " + controller.pos[1] + ").");
                                         break;
                                     }
                                     Thread.sleep(100);
@@ -124,15 +131,16 @@ public class Client extends Application {
                             } catch (InterruptedException e) {
                                 throw new RuntimeException(e);
                             }
-                            break;
-                        case "OPPONENT":
+                        }
+                        case "OPPONENT" -> {
                             System.out.println("Opponent go!");
                             String[] pos = fromServer.nextLine().split(" ");
                             int x = Integer.parseInt(pos[0]);
                             int y = Integer.parseInt(pos[1]);
                             controller.myTurn = false;
                             Platform.runLater(() -> controller.refreshBoard(x, y, -player));
-                            break;
+                        }
+                        default -> System.out.println("Invalid instruction.");
                     }
 
                 }
@@ -144,7 +152,7 @@ public class Client extends Application {
     }
 
     public static void update(String list) {
-        System.out.println("\n\n"+list);
+        System.out.println("\n\n" + list);
         System.out.println("Please choose your opponent...");
         System.out.print("Enter the opponent ID: ");
 
@@ -154,13 +162,12 @@ public class Client extends Application {
         @Override
         public void run() {
             Scanner in = new Scanner(System.in);
-//            System.out.println("Start capture input...");
             int id = in.nextInt();
             while (id == Client.ID) {
                 System.out.println("You can not choose yourself, please enter again.");
                 id = in.nextInt();
             }
-            System.out.println("You choosed User "+id+".");
+            System.out.println("You chose User " + id + ".");
             toServer.println(id);
         }
     }
@@ -175,7 +182,7 @@ public class Client extends Application {
                 instruction = fromServer.nextLine();
                 if ("ID".equals(instruction)) {
                     Client.ID = Integer.parseInt(fromServer.nextLine());
-                    System.out.println("(Your ID: "+Client.ID+")");
+                    System.out.println("(Your ID: " + Client.ID + ")");
                     new Thread(new ChooseOpponent()).start();
                 } else if ("UPDATE".equals(instruction)) {
                     update(fromServer.nextLine());

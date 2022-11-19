@@ -7,34 +7,35 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Session implements Runnable {
-    private Scanner fromUser1;
-    private PrintWriter toUser1;
-    private Scanner fromUser2;
-    private PrintWriter toUser2;
-    private int[][] chessBoard = new int[3][3];
+    private final Scanner fromUser1;
+    private final PrintWriter toUser1;
+    private final Scanner fromUser2;
+    private final PrintWriter toUser2;
+    private final int[][] chessBoard = new int[3][3];
     private int totalStep = 0;
 
     public int player1 = 1;
     public int player2 = -1;
-    private int userID = 0;
-    private int gameID = 0;
+    private final int userId;
+    private final int gameId;
 
-    public Session(Socket user1, Socket user2, int userID, int gameID) throws IOException {
+    public Session(Socket user1, Socket user2, int userId, int gameId) throws IOException {
         fromUser1 = new Scanner(user1.getInputStream());
         toUser1 = new PrintWriter(user1.getOutputStream(), true);
         fromUser2 = new Scanner(user2.getInputStream());
         toUser2 = new PrintWriter(user2.getOutputStream(), true);
-        this.userID = userID;
-        this.gameID = gameID;
+        this.userId = userId;
+        this.gameId = gameId;
     }
 
     @Override
     public void run() {
-        toUser1.println(gameID);
-        toUser2.println(gameID);
+        toUser1.println(gameId);
+        toUser2.println(gameId);
         toUser1.println(player1);
         toUser2.println(player2);
-        System.out.println("\n******The "+gameID+"_th game of User " + (userID - 1) + " and User " + userID + " start!******");
+        System.out.println("\n******The " + gameId + "_th game of User " + (userId - 1)
+                + " and User " + userId + " start!******");
         int player = player1;
         try {
             while (receive(player)) {
@@ -42,7 +43,8 @@ public class Session implements Runnable {
             }
         } catch (NoSuchElementException e) {
             (player == player1 ? toUser2 : toUser1).println("OPPONENT_EXIT");
-            System.out.println("Game abort! User" + (player == player1 ? userID - 1 : userID) + " disconnected.");
+            System.out.println("Game abort! User"
+                    + (player == player1 ? userId - 1 : userId) + " disconnected.");
         }
     }
 
@@ -53,20 +55,24 @@ public class Session implements Runnable {
         PrintWriter toOpponent = player == player1 ? toUser2 : toUser1;
         toUser.println("GO");
         instruction = fromUser.nextLine();
-        if ("CHOSEN".equals(instruction)){
+        if ("CHOSEN".equals(instruction)) {
             instruction = fromUser.nextLine();
         }
         switch (instruction) {
-            case "MOVE":
+            case "MOVE" -> {
                 String pos = fromUser.nextLine();
                 toOpponent.println("OPPONENT");
                 toOpponent.println(pos);
-                if (step(pos, player))
+                if (step(pos, player)) {
                     return false;
-                break;
-            case "Close":
-                System.out.println("Game abort! User" + (player == player1 ? userID - 1 : userID) + " exited.");
+                }
+            }
+            case "Close" -> {
+                System.out.println("Game abort! User"
+                        + (player == player1 ? userId - 1 : userId) + " exited.");
                 return false;
+            }
+            default -> System.out.println("Invalid instruction.");
         }
         return true;
     }
@@ -75,7 +81,8 @@ public class Session implements Runnable {
         int x = Integer.parseInt(pos.charAt(0) + "");
         int y = Integer.parseInt(pos.charAt(2) + "");
         chessBoard[x][y] = player;
-        System.out.println("User" + (player == player1 ? userID - 1 : userID) + " choosed (" + x + ", " + y + ")");
+        System.out.println("User" + (player == player1 ? userId - 1 : userId)
+                + " chose (" + x + ", " + y + ")");
         ++totalStep;
         return checkResult();
     }
@@ -106,11 +113,11 @@ public class Session implements Runnable {
         if (end > 0) {
             toUser1.println("WIN");
             toUser2.println("LOSE");
-            System.out.println("User" + (userID - 1) + " win!");
+            System.out.println("User" + (userId - 1) + " win!");
         } else if (end < 0) {
             toUser2.println("WIN");
             toUser1.println("LOSE");
-            System.out.println("User" + userID + " win!");
+            System.out.println("User" + userId + " win!");
         } else if (totalStep == 9) {
             toUser1.println("DRAW");
             toUser2.println("DRAW");

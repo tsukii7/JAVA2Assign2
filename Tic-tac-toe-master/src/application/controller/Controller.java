@@ -1,5 +1,7 @@
 package application.controller;
 
+import java.net.URL;
+import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.Pane;
@@ -8,15 +10,13 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 
-import java.net.URL;
-import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
     private static final int CIRCLE = 1;
     private static final int CROSS = -1;
     public static int PLAY_1 = 1;
     public static int PLAY_2 = -1;
-    public static int[] pos=new int[2];
+    public static int[] pos = new int[2];
     private static final int EMPTY = 0;
     private static final int BOUND = 90;
     private static final int OFFSET = 15;
@@ -42,7 +42,6 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         game_panel.setOnMouseClicked(event -> {
-//            System.out.println("clicked");
             int x = (int) (event.getX() / BOUND);
             int y = (int) (event.getY() / BOUND);
             if (myTurn) {
@@ -54,13 +53,11 @@ public class Controller implements Initializable {
     }
 
 
-    public boolean refreshBoard(int x, int y, int player) {
+    public void refreshBoard(int x, int y, int player) {
         if (chessBoard[x][y] == EMPTY) {
             chessBoard[x][y] = player;
             drawChess();
-            return true;
         }
-        return false;
     }
 
     private void drawChess() {
