@@ -1,12 +1,10 @@
 package application;
 
 import application.controller.Controller;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -121,11 +119,15 @@ public class Client extends Application {
                                 while (true) {
                                     if (!controller.myTurn) {
                                         Platform.runLater(() ->
-                                                controller.refreshBoard(controller.pos[0], controller.pos[1], player));
+                                                controller.refreshBoard(
+                                                        controller.pos[0], controller.pos[1],
+                                                        player));
                                         toServer.println("MOVE");
-                                        toServer.println(controller.pos[0] + " " + controller.pos[1]);
+                                        toServer.println(
+                                                controller.pos[0] + " " + controller.pos[1]);
                                         System.out.println("You chose ("
-                                                + controller.pos[0] + ", " + controller.pos[1] + ").");
+                                                + controller.pos[0] + ", "
+                                                + controller.pos[1] + ").");
                                         break;
                                     }
                                     Thread.sleep(100);
@@ -179,7 +181,7 @@ public class Client extends Application {
         while (true) {
             System.out.println("Please enter 1 to login or 2 to register:");
             String num = in.nextLine();
-            if (num.length() > 1){
+            if (num.length() > 1) {
                 System.out.println("Invalid number");
                 continue;
             }

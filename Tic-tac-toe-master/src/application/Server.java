@@ -17,7 +17,9 @@ public class Server {
     private static ArrayList<Thread> waitingThreads = new ArrayList<>();
     private static int userCnt = 0;
     private static int gameCnt = 0;
-    private static String filePath = "C:\\Users\\Ksco\\OneDrive\\文档\\CourseFile\\CS209_JAVA2\\lab\\Tic-tac-toe-master\\src\\application\\database";
+    private static String filePath =
+            "C:\\Users\\Ksco\\OneDrive\\文档\\CourseFile\\CS209_JAVA2\\lab"
+                    + "\\Tic-tac-toe-master\\src\\application\\database";
 
     public static void main(String[] args) throws IOException {
         try {
@@ -36,10 +38,10 @@ public class Server {
             System.out.println("User name:" + socket.getInetAddress().getHostName() + "\tUser ip:"
                     + socket.getInetAddress().getHostAddress());
             User user = verify(socket);
-            if (user == null)
+            if (user == null) {
                 continue;
+            }
             System.out.println("User login successfully! Add 1 waiting user.");
-//            waitingUsers.add(new User(userCnt, socket));
             waitingUsers.add(user);
             System.out.println(printWaitingUsers());
             notifyUpdate();
