@@ -1,10 +1,12 @@
 package application;
 
 import application.controller.Controller;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -172,6 +174,50 @@ public class Client extends Application {
         }
     }
 
+    public static void verify() {
+        Scanner in = new Scanner(System.in);
+        while (true) {
+            System.out.println("Please enter 1 to login or 2 to register:");
+            String num = in.nextLine();
+            if (num.length() > 1){
+                System.out.println("Invalid number");
+                continue;
+            }
+            int ins = Integer.parseInt(num);
+            while (true) {
+                if (ins == 1) {
+                    toServer.println("LOGIN");
+                    System.out.println("[Log in]");
+                    System.out.print("Please enter the account:");
+                    toServer.println(in.nextLine());
+                    System.out.print("Please enter the password:");
+                    toServer.println(in.nextLine());
+                    if ("VERIFIED".equals(fromServer.nextLine())) {
+                        System.out.println("Login successfully!");
+                        return;
+                    } else {
+                        System.out.println("Wrong account or password!");
+                    }
+                    break;
+                } else if (ins == 2) {
+                    toServer.println("REGISTER");
+                    System.out.println("[Register]");
+                    System.out.print("Please enter the account:");
+                    toServer.println(in.nextLine());
+                    System.out.print("Please enter the password:");
+                    toServer.println(in.nextLine());
+                    if ("SUCCESS".equals(fromServer.nextLine())) {
+                        System.out.println("Register successfully! Automatically log in...");
+                        return;
+                    }
+                } else {
+                    System.out.println("Invalid input, please try again.");
+                    ins = Integer.parseInt(in.nextLine());
+                }
+            }
+        }
+    }
+
     public static void main(String[] args) {
         if (!connect()) {
             return;
@@ -180,12 +226,14 @@ public class Client extends Application {
         try {
             while (true) {
                 instruction = fromServer.nextLine();
-                if ("ID".equals(instruction)) {
+                if ("NAME".equals(instruction)) {
                     Client.ID = Integer.parseInt(fromServer.nextLine());
                     System.out.println("(Your ID: " + Client.ID + ")");
                     new Thread(new ChooseOpponent()).start();
                 } else if ("UPDATE".equals(instruction)) {
                     update(fromServer.nextLine());
+                } else if ("VERIFY".equals(instruction)) {
+                    verify();
                 } else {
                     System.out.println("\n******The " + instruction + "_th game start!******");
                     player = Integer.parseInt(fromServer.nextLine());
