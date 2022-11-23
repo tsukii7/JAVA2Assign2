@@ -2,6 +2,7 @@ package application.controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.Pane;
@@ -30,12 +31,16 @@ public class Controller implements Initializable {
     private Rectangle game_panel;
 
 
-    private static final int[][] chessBoard = new int[3][3];
+    private static int[][] chessBoard = new int[3][3];
     private static final boolean[][] flag = new boolean[3][3];
 
     public void setUser(int player) {
         PLAY_1 = player;
         PLAY_2 = -player;
+    }
+
+    public void setBoard(int[][] board) {
+        chessBoard = board;
     }
 
 

@@ -1,10 +1,12 @@
 package application;
 
 import application.controller.Controller;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -19,6 +21,8 @@ public class Client extends Application {
     private static Scanner fromServer;
     private static PrintWriter toServer;
     public static int player;
+    private static int[][] chessBoard  = new int[3][3];
+
 
     private static Controller controller;
     private static int ID;
@@ -70,6 +74,7 @@ public class Client extends Application {
 
             controller = fxmlLoader.getController();
             controller.setUser(player);
+            controller.setBoard(chessBoard);
             primaryStage.setOnCloseRequest(e -> {
                 toServer.println("Close");
                 System.exit(0);
@@ -236,6 +241,21 @@ public class Client extends Application {
                     update(fromServer.nextLine());
                 } else if ("VERIFY".equals(instruction)) {
                     verify();
+                } else if ("RECONNECT".equals(instruction)) {
+                    System.out.println("\n******Reconnect to the game!******");
+                    player = Integer.parseInt(fromServer.nextLine());
+                    String str = fromServer.nextLine();
+                    String[] strs = str.split(",");
+                    int cnt = 0;
+                    for (int i = 0; i < chessBoard.length; i++) {
+                        for (int j = 0; j < chessBoard[i].length; j++) {
+                            chessBoard[i][j] = Integer.parseInt(strs[cnt++]);
+                        }
+                    }
+//                    toServer.println("CHOSEN");
+                    System.out.println("player:" + player);
+                    launch(args);
+                    break;
                 } else {
                     System.out.println("\n******The " + instruction + "_th game start!******");
                     player = Integer.parseInt(fromServer.nextLine());

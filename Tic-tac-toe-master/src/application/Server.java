@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -15,6 +16,7 @@ public class Server {
 
     public static ArrayList<User> waitingUsers = new ArrayList<>();
     private static ArrayList<Thread> waitingThreads = new ArrayList<>();
+    private static HashMap<String, User> userMap = new HashMap<>();
     private static int userCnt = 0;
     private static int gameCnt = 0;
     private static String filePath =
@@ -41,22 +43,56 @@ public class Server {
             if (user == null) {
                 continue;
             }
-            System.out.println("User login successfully! Add 1 waiting user.");
-            waitingUsers.add(user);
-            System.out.println(printWaitingUsers());
-            notifyUpdate();
-            System.out.println("Waiting for other users to connect...");
-            waitingThreads.add(new Thread(new WaitingThread(
-                    waitingUsers.get(waitingUsers.size() - 1))));
-            waitingThreads.get(waitingThreads.size() - 1).start();
+            userMap.put(user.username, user);
+            System.out.println("User login successfully!");
+            if (!checkDisconnect(user)) {
+                System.out.println("Add 1 waiting user.");
+                waitingUsers.add(user);
+                System.out.println(printWaitingUsers());
+                notifyUpdate();
+                System.out.println("Waiting for other users to connect...");
+                waitingThreads.add(new Thread(new WaitingThread(
+                        waitingUsers.get(waitingUsers.size() - 1))));
+                waitingThreads.get(waitingThreads.size() - 1).start();
+            }
         }
+    }
+
+    public static boolean checkDisconnect(User user) {
+        try {
+            File file = new File(filePath);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            String[] splited;
+            while ((line = br.readLine()) != null) {
+                splited = line.split(" ");
+                if (user.username.equals(splited[0]) && "unfinished".equals(splited[5])) {
+                    User opponent = userMap.get(splited[6]);
+
+//                    String[] str = splited[8].split(",");
+                    boolean isFirst = "yes".equals(splited[7]);
+                    if (isFirst) {
+                        new Thread(new Session(user, opponent, opponent, ++gameCnt, splited[8])).start();
+
+                    } else {
+                        new Thread(new Session(opponent, user, opponent, ++gameCnt, splited[8])).start();
+                    }
+                    br.close();
+                    return true;
+                }
+            }
+            br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static void saveAccount(String username, String password) {
         BufferedWriter out = null;
         try {
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath, true)));
-            out.write(username + " " + password + " 0 0 0\r\n");
+            out.write(username + " " + password + " 0 0 0 finished null null 0\r\n");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -193,7 +229,7 @@ public class Server {
                 notifyUpdate();
                 System.out.println(printWaitingUsers());
                 if (opponent != null) {
-                    new Thread(new Session(opponent, user, userCnt, gameCnt)).start();
+                    new Thread(new Session(opponent, user, null, gameCnt, "")).start();
                 } else {
                     System.out.println("User entered an invalid opponent ID.");
                 }
