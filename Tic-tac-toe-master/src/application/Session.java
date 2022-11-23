@@ -1,9 +1,7 @@
 package application;
 
 import application.Server.User;
-
 import java.io.*;
-import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -25,23 +23,17 @@ public class Session implements Runnable {
     private static String filePath =
             "C:\\Users\\Ksco\\OneDrive\\文档\\CourseFile\\CS209_JAVA2\\lab"
                     + "\\Tic-tac-toe-master\\src\\application\\database";
-//    private static String user1Name;
-//    private static String user2Name;
 
-    public Session(User userFirst, User userSecond, User waitingUser, int gameId, String board) throws IOException {
+    public Session(User userFirst, User userSecond, User waitingUser,
+                   int gameId, String board) throws IOException {
         this.board = board;
         this.user1 = userFirst;
         this.user2 = userSecond;
         this.waitingUser = waitingUser;
-//        user1Name = userFirst.username;
-//        user2Name = userSecond.username;
-//        Socket user1 = userFirst.socket;
-//        Socket user2 = userSecond.socket;
         fromUser1 = new Scanner(user1.socket.getInputStream());
         toUser1 = new PrintWriter(user1.socket.getOutputStream(), true);
         fromUser2 = new Scanner(user2.socket.getInputStream());
         toUser2 = new PrintWriter(user2.socket.getOutputStream(), true);
-//        this.userId = userId;
         this.gameId = gameId;
     }
 
@@ -81,7 +73,6 @@ public class Session implements Runnable {
 
             }
         } catch (NoSuchElementException e) {
-//            (player == player1 ? toUser2 : toUser1).println("OPPONENT_EXIT");
             saveGameState(player);
             System.out.println("Game abort! User"
                     + (player == player1 ? user1.id : user2.id) + " disconnected.");

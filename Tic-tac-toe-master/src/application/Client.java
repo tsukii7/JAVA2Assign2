@@ -1,12 +1,10 @@
 package application;
 
 import application.controller.Controller;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -252,7 +250,6 @@ public class Client extends Application {
                             chessBoard[i][j] = Integer.parseInt(strs[cnt++]);
                         }
                     }
-//                    toServer.println("CHOSEN");
                     System.out.println("player:" + player);
                     launch(args);
                     break;

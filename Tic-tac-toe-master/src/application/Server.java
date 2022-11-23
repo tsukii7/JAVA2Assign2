@@ -68,14 +68,16 @@ public class Server {
                 splited = line.split(" ");
                 if (user.username.equals(splited[0]) && "unfinished".equals(splited[5])) {
                     User opponent = userMap.get(splited[6]);
-
-//                    String[] str = splited[8].split(",");
                     boolean isFirst = "yes".equals(splited[7]);
                     if (isFirst) {
-                        new Thread(new Session(user, opponent, opponent, ++gameCnt, splited[8])).start();
+                        new Thread(
+                                new Session(user, opponent, opponent, ++gameCnt, splited[8]))
+                                .start();
 
                     } else {
-                        new Thread(new Session(opponent, user, opponent, ++gameCnt, splited[8])).start();
+                        new Thread(
+                                new Session(opponent, user, opponent, ++gameCnt, splited[8]))
+                                .start();
                     }
                     br.close();
                     return true;
